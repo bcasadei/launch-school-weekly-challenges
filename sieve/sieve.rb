@@ -25,5 +25,5 @@ class Sieve
   end
 end
 
-# numbers = Sieve.new(100)
-# p numbers.primes
+numbers = Sieve.new(100)
+p numbers.primes
