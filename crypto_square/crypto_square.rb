@@ -1,17 +1,19 @@
-
+require 'pry'
 
 class Crypto
 
   def initialize(string)
-    @string = string.downcase
+    @string = string
   end
 
   def normalize_plaintext
-    normalized = @string.delete(" _#$%^&!.,-").to_s
+    normalized = @string.delete(" _#$%^&!.,-").downcase
   end
 
   def size
     size = normalize_plaintext.size
+
+    # Math.sqrt(size).ceil # Gets the square root and rounds up to the next number
 
     case size
     when 2..4
@@ -33,59 +35,41 @@ class Crypto
     when 82..100
       10
     end
-      # return integer of number of columns
   end
 
   def cipher_table
-    # store text: alternate data handling
-    # table = {
-    #   :col1 => ['c', 's']
-    #   :col2 => ['c', 's']
-    # }
+    table = Hash.new(0)
+    characters = normalize_plaintext
+
+    size.times do |i|
+      table[('row_' + i.to_s).to_sym] = characters.slice!(0...size).split('')
+    end
+
+    table.delete_if { |key, value| value.empty? }
   end
 
   def plaintext_segments
-    plaintext_segments = []
-    characters = normalize_plaintext
-
-    while characters.size > 0
-      plaintext_segments << characters.slice!(0...size)
-    end
-
-    plaintext_segments
-    # return array with text broken into columns e.g. %w(zomg zomb ies)
+    cipher_table.values.map { |value| value.join('')}
   end
 
   def ciphertext
-    segments = plaintext_segments
-    cipher = ''
-
-    counter = 0
-
-    while counter < segments[0].size
-      segments.map { |segment| cipher += segment[counter] if segment[counter] }
-      counter += 1
+    cipher = []
+    size.times do |i|
+      cipher_table.each_value { |value| cipher << value[i] }
     end
-    cipher
-
-    #return string of text in cipher (obtained by reading down the columns going left to right)
+    cipher.compact.join('')
   end
 
   def normalize_ciphertext
-    normalize_cipher = []
-    characters = ciphertext
-    row_size = (characters.size / size.to_f).ceil
+    normalize_cipher = ''
 
-
-    while characters.size > 0
-      normalize_cipher << characters.slice!(0...row_size)
+    size.times do |i|
+      cipher_table.each do |key, value| 
+        normalize_cipher += value[i] if value[i]
+      end
+      normalize_cipher += " "
     end
-
-    normalize_cipher.join(' ')
-    # return a string of text broken into
+    normalize_cipher.strip
   end
 
 end
-
-crypto = Crypto.new('Madness, and then illumination.')
-p crypto.normalize_ciphertext
