@@ -1,5 +1,5 @@
 require 'pry'
-
+# TODO Not complete
 class SumOfMultiples
   def initialize(num1, num2, *num3)
     @num1 = num1
